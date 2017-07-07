@@ -22,6 +22,40 @@ int x = 0;
 extern int x;
 ```
 
+`[**練習 W05_05]讓使用者輸入一個正整數，譬如 13579，利用 while 迴圈以及 % 求餘數，輸出如下的結果
+The number 13579 can be written as 9 + 7*10 + 5*100 + 3*1000 + 1*10000.`
+
+`[練習 W09_04]寫 void count_down(int n)，用 recursion 方式顯示出由 n 倒數到 0 然後再正數到 n 的數列，譬如呼叫 count_down(6) 就會顯示 6543210123456。在主程式裡測試一下作用是否正確。(注意只有顯示一個 0。)`
+
+`[練習 WB_06]試著解釋一下，下面的程式碼的執行結果。如果把上面 f() 裡的 static 字拿掉會怎樣？ `
+
+```C
+#include <stdio.h>
+
+int aa = 100;
+
+int* f(void)
+{
+	static int aa = 3;
+	
+	printf("f: %d\n", aa++);
+	return &aa;
+}
+
+int main(void)
+{
+	int *aptr;
+	
+	printf("main: %d\n", aa++);
+	aptr = f();
+	printf("main: %d\n", aa++);
+	*aptr = 10;
+	f(); 
+	return 0 ;
+}
+```
+
+
 ## 資料處理
 相關函數：
 *   [qsort](http://www.gnu.org/software/libc/manual/html_node/Array-Sort-Function.html#Array-Sort-Function)
@@ -628,3 +662,72 @@ int main(void)
 }
 
 ```
+
+## Struct 練習題
+
+ `[練習 WD_01]                                                                        
+寫一個 function ptInRect() 來判斷某個點 p 是否落在某個長方形 r 裡面，是則回傳 1，否則回傳 0。  `
+
+```C
+int ptInRect(struct t_point p, struct t_rect r); 
+```
+
+`[練習 WD_02]
+宣告新的型別 Rect 來代表 struct t_rect，產生指到 Rect screen 的指標，透過指標修改 screen 範圍。`
+
+
+`[練習 WD_03]
+寫出 function randPoint() 隨機在某個長方形 r 範圍內產生 n 個點。
+
+```C
+void randPoint(Rect r, Point p[], int n);
+```
+
+
+產生的點儲存在 p[] 裡面。然後再寫出 funciton meanPoint() 計算 p[] 裡頭的 n 個點的 mean。`
+
+```C
+Point meanPoint(Point p[], int n);
+```
+
+`[練習 WD_04] `
+
+* 用圖示來解釋下面的運作原理
+
+```C  
+unsigned getBits(unsigned x, int p, int n)
+{
+   return ( x >> (p-n) ) & ~( ~0 << n );  /* 取出 x 的第 p 位置起 n 個 bits */
+}
+```
+
+* 寫出 unsigned invert(x, p, n) 把 x 第 p 位置起 n 個 bits 由 0 變 1，1 則變為 0。
+* 寫出 unsigned rightRotate(x, n) 傳回 x 向右 rotate n bits 之後的結果。
+
+
+`[練習 W02_02]宣告兩個整數變數分別代表兩個正方形的邊長，計算第一個正方形和第二個正方形的面積差，然後把答案顯示在螢幕上。`
+
+`[練習 W03_04]讓使用者輸入一星期的零用錢有多少，假設假日可以花的錢是平常的 1.5 倍，在螢幕上顯示每天可以花的數目。(譬如， Mon: 200, Tues: 200, …,Sat: 300, Sun: 300。)`
+
+`[練習 W03_05]讓使用者輸入時速 (公里/小時)，用程式換算成 (公尺/秒) 把結果輸出到螢幕上。`
+
+`[練習 W04_02]`
+
+* 讓使用者輸入某個 NBA 球員的名字，接著要求輸入該球員的身高幾公分 (int)，然後用程式換算成英制單位，並在螢幕上顯示球員名字和他的身高是幾呎幾吋。(除法運算的符號是 /，譬如 x = 5 / 2;，另外如果還有些印象，整數的除法運算結果，小數點會被無條件捨去。)
+
+* 大家目前應該和 printf() 混得蠻熟了，printf() 除了常用的 %d, %f, %s 這些格式之外，還有很多其他格式可用，詳細用法請參考課程網頁上所附的連結 The GNU C Library Reference Manual  (glibc-manual-2.2.5.pdf) 12.12 Formatted Output, p. 264。
+
+* 雖然都沒正式提過，但是大家應該有都觀察的出來，printf() 的格式其實就是
+
+```C
+printf(control-string, item1, item2, ...);
+```
+
+* 其中 control-string 是用 "..." 指定的那一連串輸出格式設定，而 item1, item2, ... 就是你要輸出的資料。再次提醒要特別小心 control-string 裡的 %d 之類的輸出格式設定要和後面傳入的參數有一對一的對應，譬如
+
+```C
+printf(": %d ft %d in\n", "LeBron James", foot, inches);
+```
+
+* 是錯的，因為少了一個 %s，對應到 "LeBron James"。
+
