@@ -170,7 +170,111 @@ int main(void)
 
 > Note:  
 > 上例輸出僅僅只是觀察中間排序的過程，實際上`qsort`的實作並沒有被嚴格規範  
-> 即使是一樣的數列，可能在不同的編譯器上會有不同的結果  
+> 即使是一樣的數列，可能在不同的編譯器上會有不同的結果  
+
+
+
+`[練習 W10_01] 用導向方式 (例如D:\COURSE\I2P\code>W10_01.exe < test.txt) 讀入一串整數，假設整數的個數不超過 100 個數，且每個整數值都介於 0 和 1,000,000 範圍之內。先把讀入的資料存入陣列中，然後一併找出其中最大值和最小值。`
+
+* *用下列程式碼產生亂數檔"number.txt"*
+
+```C
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    int ii,max;
+
+    FILE *random;
+    random=fopen("number.txt","w");
+
+    printf("How many number do you want?\n");
+    scanf("%d",&max);
+    for(ii=0;ii<max;ii++){
+		fprintf(random,"%d\n",rand()%1000000);
+    }
+
+    fclose(random);
+    return 0;
+}
+```
+
+* *用下列程式碼找出最大最小值*
+```C
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    int total=0;
+    int max=0, min=0;
+    int number[100];
+
+    FILE *random;
+
+    random=fopen("number.txt","r");
+
+
+    while(fscanf(random,"%d",&number[total])!=EOF)
+	{
+		if(max<number[total]) max=number[total];
+
+		if(min>number[total]) min=number[total];
+		total++;
+	}
+
+	printf("The max is %7d\n",number[total-1]);
+	printf("The min is %7d\n",number[0]);
+
+    return 0;
+}
+
+```
+
+
+`[練習 W10_02] 和 W10_01 的輸入資料相同，把資料從小到大按照順序排好。`
+
+* *用下列程式碼排序數列*
+
+
+```C
+#include <stdio.h>
+#include <stdlib.h>
+
+int compare(void *a,void *b)
+{
+	int *c=a;
+	int *d=b;
+
+	if(a>b) return 1;
+	else	return 0;
+}
+
+int main()
+{
+    int total=0;
+    int number[100];
+
+    FILE *random;
+
+    random=fopen("number.txt","r");
+
+
+    while(fscanf(random,"%d",&number[total])!=EOF)
+	{
+		total++;
+	}
+
+	qsort(number,total,sizeof(int),compare);
+
+	printf("The max is %7d\n",number[total-1]);
+	printf("The min is %7d\n",number[0]);
+
+    return 0;
+}
+
+```
 
 ## 對固定長度的字元陣列排序
 
@@ -696,5 +800,192 @@ int main(void)
     free(ptr);
 
     return 0;
+}
+```
+`[練習 W10_08] 根據變數的宣告來判斷下列動作是否合法。`
+
+```C
+pt = &a[0][0];
+pt = a[0];
+pa = a; 
+pa = b; 
+p2 = &pt;
+*p2 = b[0];
+p2 = b;
+```
+
+* *宣告型式：*
+
+```C
+int *pt;
+int (*pa)[3];
+int a[2][3];
+int b[3][2];
+int **p2;
+```
+
+`[練習 WA_01]
+請用圖示方式來表示 b 和 bp 的關聯。假如 b 所儲存的值為 3，而 b 這個變數的記憶體位址是 100000。`
+
+
+
+`[練習 WA_02]
+產生一個 float 變數 x 和一個指向 float 的指標 xp，先直接把 x 的值設為 3.1，然後再透過 xp 讓 x 的值增加 0.04。`
+
+
+
+`[練習 WA_03]
+試著用 debugger 來 trace 主程式呼叫 swap() 的過程，看看局部變數 a 和 b 什麼時候會存在。
+大家應該都已經非常熟悉 swap()，知道要改成下面的寫法才對`
+
+```C
+void swap(double *a, double *b)
+{
+   double tmp; 
+   tmp = *a;
+   *a = *b;
+   *b = tmp;
+}
+```
+
+`[練習 WA_04]
+寫一個 function 傳入整數值 n，求出 1+2+...+n 和 1*1+2*2+...+n*n 並把答案分別儲存到主程式中的兩個變數 m 和 s 中。`
+
+`[練習 WA_05]
+假如是 char *pa; 則 (pa+1) 和 pa 差多少？`
+由此衍伸出來，我們得到四種存取陣列元素的寫法，
+
+```C
+int a[10], *pa;
+pa = &a[0];
+*pa = 1;
+pa[1] = 2;
+a[2] = 3;
+*(a + 3) = 4;
+```
+
+* 其中第四種用法要稍微注意一下，陣列名稱 a 代表陣列開頭元素的位址，但是它並不是一個指標變數，程式compile 之後它所代表的相對位址就會確定，譬如在 1000 這個位址, 而 &a[2] 就變成 1008, 而 (a + 3) 就變成 1012。所以 a++ 這樣的動作對陣列來說是不行的；雖然陣列的名稱在大多數情況下用法和指標沒兩樣，但是它終究只是那一連串陣列元素的代稱(代表著開頭位址)，而不是一個指標變數，所以不能去改變它的值。(實際上， compiler 看到 a[2] 這樣的寫法時，會把它翻譯成 *(a+2*sizeof(int))，然後再把 a 用位址取代。)
+除此此外，在 function 的參數宣告中 void f(int ary[]) 和 void f(int *ary) 陣列與指標這兩種不同寫法是完全相通的。(可能會讓人覺得比較奇怪的是對於 int ary[] 這種用法，在 f() 裡頭可以使用 ary++，因為對 function 來說，參數 ary 其實是個存放在堆疊記憶體中的變數，不過這已經有些離題了。)
+同樣的，呼叫時傳遞位址也可以用兩種方式
+f(a);
+f(&a[0]);
+甚至如果有需要，不一定要傳陣列的開頭位址，譬如
+f(a + 2);
+f(&a[2]); 
+
+
+
+* 而呼叫的地方應該改成 swap(&x, &y); 因為我們必須把存放 x 和 y 兩個變數的記憶體位址 &x 和 &y 告訴 swap()，讓 swap() 到那兩個位址去找，參數傳進去後相當於做了 a = &x; 和 b = &y; 的動作。然後用 *a 和 *b 來設定那兩個記憶體位址中所儲存的值。
+
+
+
+`[練習 WA_06] 
+寫個小程式測試一下，如果 pa = &a[2]; 那麼 pa[-1] 或 *(pa-2) 這樣的用法可以用嗎？`
+
+
+`[練習 WA_07]
+寫一個 function f()，傳入兩個各自已經由小到大排序好的正整數陣列 a 和 b, 以及一個比 a 和 b 合起來還長的空陣列 c, (假設 a 和 b 的最後一個元素都是 -1 代表陣列結束),f() 要將 a 和 b 合併並且從大到小
+排好儲存在 c 裡頭。`
+
+`[練習 WA_08]
+
+說明並圖示下面兩種寫法的差異：
+
+```C
+char str1[] = "piece of cake";
+char *str2 = "piece of cake"; /* 附註：ANSI C 要求 compiler 可以支援到長度 509 的字串`
+```
+
+`[練習 WA_09]
+假設在 main() 裡面有下列三行，請問 str1， str2， str3 的內容會是什麼？`
+
+```C
+char str1[100];
+char str2[100] = {'a'}; 
+char str3[100] = "";
+```
+
+`[練習 WA_10]
+寫一個 function 傳入一個字串，傳回該字串的長度 (整數值)。`
+
+`[練習 WA_11]
+寫一個 function f()，傳入一個字串，判斷是否為 palindrome (像是 "level", "wasitacatisaw")。`
+
+`[練習 WA_12]
+用圖示表現出下面的字串`
+
+```C
+char *ptrary[] = {"piece", "of", "cake"};
+```
+
+
+`[練習 WA_13]
+圖示下面兩種寫法的差別`
+
+```C
+char *str1[] = {"piece", "of", "cake"};
+char str2[][8] = {"piece", "of", "cake"};
+```
+
+`[練習 WA_14]`
+
+* 二維陣列使用起來很方便，譬如用來儲存矩陣或影像。但是在 C 程式中我們必須預先給定陣列大小，譬如
+int a[10][20];。這個練習是要藉由指標陣列來模擬動態產生二維陣列的機制。
+假設程式最前面已經定了兩個 global 陣列：char buf[1000000]; 是一個字元陣列。char *bptr[1000]; 是一個字元指標的陣列。
+試著寫出一個 function 叫做 char ** mtx(int m, int n); 傳入的參數 m 和 n 代表我們想要產生的二維陣列的大小，回傳值則是一個指向指標的指標。 mtx() 要替我們設定 bptr 的指標內容 (指到 buf)，然後傳回一個指標，讓我們能用例如 p = mtx(5, 10); 的方式取得一個二維陣列，然後就可以在程式把 p (type 是 char **) 當作二維陣列來使用，譬如 p[2][5] = 7。在　mtx() 裡面應該會包含兩個 static 變數，用來記住已經被使用掉的 buf 和 bptr 有多少。如果　mtx() 發現沒有足夠的空間產生二維陣列，就把回傳值設為 NULL。
+
+![Alt text](ptr/WA_14.png)
+   
+
+`[練習 W09_09] 寫一個 function 叫做 sort2()，它的作用是讓兩個變數 a 和 b 在經過呼叫 sort2() 之後，a 的值變成 a 和 b 之中較小的值，同時 b 的值被改成 a 和 b 之中較大的值。試著用指標和位址存取方式來寫。`
+
+Bits運算：
+
+`[練習 W07_03]令 x = 5; 而 y = 3;，判斷下列 expressions 是 true 還是 false。`
+
+
+```C
+x > 2 && y == 3
+!(x < 2 || y == 3)
+x != 0 && y
+x == 0 || !y
+x != y && (20/x) < y 
+!(y > 5 || y < 2) && !(x%5)
+!x && x
+
+```
+
+##Static：
+
+`[**練習 W05_05]讓使用者輸入一個正整數，譬如 13579，利用 while 迴圈以及 % 求餘數，輸出如下的結果
+The number 13579 can be written as 9 + 7*10 + 5*100 + 3*1000 + 1*10000.`
+
+`[練習 W09_04]寫 void count_down(int n)，用 recursion 方式顯示出由 n 倒數到 0 然後再正數到 n 的數列，譬如呼叫 count_down(6) 就會顯示 6543210123456。在主程式裡測試一下作用是否正確。(注意只有顯示一個 0。)`
+
+`[練習 WB_06]試著解釋一下，下面的程式碼的執行結果。如果把上面 f() 裡的 static 字拿掉會怎樣？ `
+
+```C
+#include <stdio.h>
+
+int aa = 100;
+
+int* f(void)
+{
+	static int aa = 3;
+	
+	printf("f: %d\n", aa++);
+	return &aa;
+}
+
+int main(void)
+{
+	int *aptr;
+	
+	printf("main: %d\n", aa++);
+	aptr = f();
+	printf("main: %d\n", aa++);
+	*aptr = 10;
+	f(); 
+	return 0 ;
 }
 ```
